@@ -46,10 +46,14 @@ const ref = query(collection(db,"blogs"),orderBy("timestamp" , "desc"));
     data.docChanges().forEach(change => {
         let card = document.getElementById("card");
         bArray.push(change.doc.data())
+        console.log("change >>>" , change);
         console.log("Araay >>>" , bArray);
-      
         console.log("This is change" ,change.doc.data());
-        card.innerHTML += ` <div class="card mt-4" >         
+        if (change.type == "removed") {
+            let deleteBLog = document.getElementById(change.doc.id)
+            deleteBLog.remove()
+        }else{ 
+        card.innerHTML += ` <div class="card mt-4" id='${change.doc.id}' >         
      <div class="card-body">
          <h4 class="card-title text-capitalize">Title: ${change.doc.data().title}</h4>
     <hr/>
@@ -66,6 +70,7 @@ const ref = query(collection(db,"blogs"),orderBy("timestamp" , "desc"));
          </div>
         </div>
         </div>`;
+    }
     });
    
 })
@@ -127,8 +132,41 @@ blogBtn && blogBtn.addEventListener("click", addBlog);
 
 
 let delData = async (id) => {
-
-    console.log(id);
-    await deleteDoc(doc(db, "blogs", id));
+    // console.log(id);
+    try {
+        await deleteDoc(doc(db, "blogs", id));
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "success",
+            title: "Post deleted successfully"
+          });
+    } catch (error) {
+        console.log(error);
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "error",
+            title: "Action Failed , Please Try Again:("
+          });
+    }
 }
 window.delData = delData;
