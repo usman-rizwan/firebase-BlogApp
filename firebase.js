@@ -1,7 +1,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
-import { getFirestore, collection, addDoc, setDoc ,doc , deleteDoc  ,serverTimestamp ,getDocs ,onSnapshot,  query, orderBy, limit  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, setDoc ,doc , deleteDoc  ,serverTimestamp ,getDocs ,onSnapshot,  query, orderBy, limit ,updateDoc   } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 
 const firebaseConfig = {
@@ -21,7 +21,8 @@ export {
   deleteDoc ,
   serverTimestamp ,
   getDocs ,onSnapshot ,
-  query, orderBy, limit
+  query, orderBy, limit,
+  updateDoc ,
 
   
 };
