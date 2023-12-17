@@ -28,14 +28,55 @@ import {
 } from "/firebase.js";
 
 let title = document.getElementById("title");
-let card = document.getElementById("card");
 let btnText = document.getElementById("btnText");
 let loader = document.getElementById("loader");
-var newDocId; // Declare a variable to store the document ID
+let blogLoader = document.getElementById("blogLoader");
+
+let getBlogData =  () => {
+    blogLoader.innerHTML = `<div class="text-center">
+     <div class="spinner-border text-primary" role="status" id="loader" style="width: 80px; height: 80px; ">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  </div> `
+
+const ref = query(collection(db,"blogs"),orderBy("timestamp" , "desc"));
+  const unsubscribe = onSnapshot(ref,(data)=>{
+    blogLoader.innerHTML =""
+    const bArray = [];
+    data.docChanges().forEach(change => {
+        let card = document.getElementById("card");
+        bArray.push(change.doc.data())
+        console.log("Araay >>>" , bArray);
+      
+        console.log("This is change" ,change.doc.data());
+        card.innerHTML += ` <div class="card mt-4" >         
+     <div class="card-body">
+         <h4 class="card-title text-capitalize">Title: ${change.doc.data().title}</h4>
+    <hr/>
+        <p class="card-text">${change.doc.data().blogContent}</p>
+    <div class="d-flex justify-content-end">
+    <!-- Edit Icon -->
+         <button type="button" class="btn btn-warning mx-2">
+            <i class="fas fa-edit"></i> Edit
+ </button>
+            <!-- Delete Icon -->
+            <button type="button" onclick="delData('${change.doc.id}')" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Delete
+            </button>
+         </div>
+        </div>
+        </div>`;
+    });
+   
+})
+
+
+
+}
+getBlogData()
+
 let addBlog = async () => {
     var editorContent = quill.root.innerHTML;
-
-
     if (title.value.trim() && editorContent.trim()) {
         btnText.style.display = "none";
         blogBtn.disabled = true;
@@ -46,13 +87,10 @@ let addBlog = async () => {
                 blogContent: editorContent,
                 timestamp: serverTimestamp(),
             });
-
-            newDocId = docRef.id; 
-
             btnText.style.display = "block";
             blogBtn.disabled = false;
             loader.style.display = "none";
-            console.log("Document written with ID: ", newDocId);
+            console.log("Document written with ID: ", docRef.id);
             // console.log(editorContent);
             title.value = "";
             quill.root.innerHTML = "";
@@ -86,45 +124,10 @@ let addBlog = async () => {
 let blogBtn = document.getElementById("blogBtn");
 blogBtn && blogBtn.addEventListener("click", addBlog);
 
-let getBlogData =  () => {
-    card.innerHTML = `<div class="text-center">
-     <div class="spinner-border text-primary" role="status" id="loader" style="width: 80px; height: 80px; ">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-  </div> `
-  const q = query(collection(db,"blogs"),orderBy("timestamp" , "desc"));
-  const unsubscribe = onSnapshot(q,(data)=>{
-    card.innerHTML = ""
-    data.docChanges().forEach(change => {
-        // card.innerHTML = ""
-        console.log("This is change" ,change);
-        card.innerHTML += ` <div class="card mt-4" >         
-     <div class="card-body">
-         <h4 class="card-title text-capitalize">Title: ${change.doc.data().title}</h4>
-    <hr/>
-        <p class="card-text">${change.doc.data().blogContent}</p>
-    <div class="d-flex justify-content-end">
-    <!-- Edit Icon -->
-         <button type="button" class="btn btn-warning mx-2">
-            <i class="fas fa-edit"></i> Edit
- </button>
-            <!-- Delete Icon -->
-            <button type="button" onclick="delData('${change.doc.id}')" class="btn btn-danger">
-                <i class="fas fa-trash-alt"></i> Delete
-            </button>
-         </div>
-        </div>
-        </div>`;
-    });
-   
-})
 
-
-
-}
-getBlogData()
 
 let delData = async (id) => {
+
     console.log(id);
     await deleteDoc(doc(db, "blogs", id));
 }
