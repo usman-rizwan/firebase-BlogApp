@@ -92,12 +92,16 @@ let getBlogData = () => {
     <hr/>
         <p class="card-text">${change.doc.data().blogContent}</p>
     <div class="d-flex justify-content-end">
+
     <!-- Edit Icon -->
+
          <button type="button" onclick="editBlog('${
            change.doc.id
          }')" class="btn btn-warning mx-2">
-            <i class="fas fa-edit"></i> Edit
+            <i class="fas fa-edit"></i> Edit  
  </button>
+
+
             <!-- Delete Icon -->
             <button type="button" onclick="delData('${
               change.doc.id
@@ -187,7 +191,19 @@ let delData = async (id) => {
 };
 window.delData = delData;
 
-let editBlog = (id) => {
+let editBlog = async (id) => {
     console.log(id);
+    const { value: text } = await Swal.fire({
+      input: "textarea",
+      inputLabel: "BLOG",
+      inputPlaceholder: "Update Your Blog...",
+      inputAttributes: {
+        "aria-label": "Type your message here"
+      },
+      showCancelButton: true
+    });
+    if (text) {
+      Swal.fire(text);
+    }
 };
 window.editBlog = editBlog;
