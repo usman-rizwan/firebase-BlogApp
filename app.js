@@ -81,7 +81,7 @@ let getBlogData = () => {
           icon: "success",
           title: "Post deleted successfully",
         });
-      } else {
+      } else if(change.type == "added") {
         card.innerHTML += ` <div class="card mt-4" id='${
           change.doc.id
         }' >         
