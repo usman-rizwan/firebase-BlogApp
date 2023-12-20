@@ -23,6 +23,7 @@ var quill = new Quill("#editor", {
   },
   theme: "snow",
 });
+
 import {
   app,
   collection,
@@ -57,7 +58,7 @@ let getBlogData = () => {
   const unsubscribe = onSnapshot(ref, (data) => {
     blogLoader.innerHTML = "";
     // const bArray = [];
-    // card.innerHTML = "" 
+    // card.innerHTML = ""
     data.docChanges().forEach((change) => {
       // bArray.push(change.doc.data());
       console.log("change >>>", change);
@@ -81,7 +82,7 @@ let getBlogData = () => {
           icon: "success",
           title: "Post deleted successfully",
         });
-      } else if(change.type == "added") {
+      } else if (change.type == "added") {
         card.innerHTML += ` <div class="card mt-4" id='${
           change.doc.id
         }' >         
@@ -95,16 +96,15 @@ let getBlogData = () => {
 
     <!-- Edit Icon -->
 
-         <button type="button" onclick="editBlog('${
-           change.doc.id 
-         }')" class="btn btn-warning mx-2">
-            <i class="fas fa-edit"></i> Edit  
+         <button type="button"  onclick="editBlog('${change.doc.id}', '${change.doc.data().blogContent}')" class="btn btn-warning mx-2">
+            <i class="fas fa-edit"></i> Edit 
+             
  </button>
 
 
             <!-- Delete Icon -->
             <button type="button" onclick="delData('${
-              change.doc.id 
+              change.doc.id
             }')" class="btn btn-danger">
                 <i class="fas fa-trash-alt"></i> Delete
             </button>
@@ -133,7 +133,7 @@ let addBlog = async () => {
       btnText.style.display = "block";
       blogBtn.disabled = false;
       loader.style.display = "none";
-      console.log("Document written with ID: ", docRef.id)
+      console.log("Document written with ID: ", docRef.id);
       // console.log(editorContent);
       title.value = "";
       quill.root.innerHTML = "";
@@ -191,29 +191,33 @@ let delData = async (id) => {
 };
 window.delData = delData;
 
-let editBlog = async (id) => {
-    console.log(id);
-    const docRef = doc(db, 'blogs', id);
-    const { value: text } = await Swal.fire({
-      input: "textarea",
-      inputLabel: "BLOG",
-      inputPlaceholder: "Update Your Blog Content...",
-      inputAttributes: {
-        "aria-label": "Type your message here"
-      },
-      showCancelButton: true
+
+
+let editBlog = async (id , bContent) => {
+  console.log(id);
+  console.log(bContent);
+  const docRef = doc(db, 'blogs', id);
+  const { value: text  } = await Swal.fire({
+    input: "textarea",
+    inputLabel: "BLOG",
+    inputPlaceholder: "Update Your Blog Content...",
+    inputAttributes: {
+      "aria-label": "Type your message here"
+    },
+    showCancelButton : true
+  })
+
+  if (text) {
+    Swal.fire(`You updated to ${text}`);
+    console.log(text);
+    try {
+      const updateBlog = await updateDoc(docRef, {
+        blogContent: text,
+        timestamp: serverTimestamp()
     });
-    if (text) {
-      Swal.fire(`You updated to ${text}`);
-      console.log(text);
-      try {
-        const updateBlog = await updateDoc(docRef, {
-          blogContent: text,
-          timestamp: serverTimestamp()
-      });
-      } catch (error) {
-        console.log(error);
-      }
+    } catch (error) {
+      console.log(error);
     }
+  }
 };
 window.editBlog = editBlog;
