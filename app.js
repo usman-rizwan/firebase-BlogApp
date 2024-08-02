@@ -55,7 +55,7 @@ let getBlogData = () => {
   const ref = query(collection(db, "blogs"), orderBy("timestamp", "desc"));
   const unsubscribe = onSnapshot(ref, (snapshot) => {
     blogLoader.innerHTML = "";
-    card.innerHTML = ""; // Clear card content to avoid duplicates
+    card.innerHTML = ""; 
     snapshot.forEach((doc) => {
       let blogData = doc.data();
       card.innerHTML += ` 
