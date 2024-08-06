@@ -44,7 +44,6 @@ let loader = document.getElementById("loader");
 
 let card = document.getElementById("card");
 let blogLoader = document.getElementById("blogLoader");
-
 let getBlogData = () => {
   blogLoader.innerHTML = `<div class="text-center">
      <div class="spinner-border text-primary" role="status" id="loader" style="width: 80px; height: 80px; ">
@@ -58,6 +57,7 @@ let getBlogData = () => {
     card.innerHTML = ""; 
     snapshot.forEach((doc) => {
       let blogData = doc.data();
+      let safeBlogContent = blogData.blogContent.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       card.innerHTML += ` 
         <div class="card mt-4" id='${doc.id}' >         
           <div class="card-body">
@@ -66,7 +66,7 @@ let getBlogData = () => {
             <p class="card-text">${blogData.blogContent}</p>
             <div class="d-flex justify-content-end">
               <!-- Edit Icon -->
-              <button type="button" onclick="editBlog('${doc.id}', '${blogData.blogContent}')" class="btn btn-warning mx-2">
+              <button type="button" onclick="editBlog('${doc.id}', '${safeBlogContent}')" class="btn btn-warning mx-2">
                 <i class="fas fa-edit"></i> Edit 
               </button>
               <!-- Delete Icon -->
@@ -130,6 +130,21 @@ let delData = async (id) => {
   try {
     await deleteDoc(doc(db, "blogs", id));
     console.log(`Post of id ${id} deleted`);
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+    Toast.fire({
+      icon: "success",
+      title: "Post deleted successfully",
+    });
   } catch (error) {
     const Toast = Swal.mixin({
       toast: true,
